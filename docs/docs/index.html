@@ -1,0 +1,66 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Search Ranking & Discoverability Capstone - Refresh/Content Opportunity Scoring</title>
+<style>
+body{font-family:system-ui,sans-serif;max-width:820px;margin:40px auto;padding:0 20px;line-height:1.6;color:#222}
+h1{font-size:1.8em}h2{margin-top:2em;border-bottom:2px solid #eee;padding-bottom:6px}
+table{border-collapse:collapse;width:100%;margin:1em 0}
+td,th{border:1px solid #ddd;padding:8px;text-align:left}
+th{background:#f5f5f5}
+code{background:#f5f5f5;padding:2px 6px;border-radius:4px}
+.note{background:#fffbea;border-left:4px solid #f0c000;padding:10px 15px;margin:1em 0}
+</style>
+</head>
+<body>
+
+<h1>Prioritizing Content for Refresh: A Ranked, Evidence-Based Approach</h1>
+<p><em>Gopinath | FlyRank AI ML Internship Capstone | Lane: Refresh / Content Opportunity Scoring</em></p>
+
+<h2>Abstract</h2>
+<p>This paper builds a ranked content-refresh review queue for search-visible pages, using only observable search and content signals - never a product decision flag. A transparent baseline (three hand-written reason codes) is compared against a Random Forest model on the same client-grouped holdout split. The learned model outperforms the baseline on Precision@50, showing that a small set of observable signals can meaningfully rank refresh priority. Results are decision-support only.</p>
+
+<h2>1. Introduction / Problem Statement</h2>
+<p>Content teams cannot manually review every page every cycle. The decision this project supports: which pages should a reviewer look at first for a content refresh? A wrong call costs either wasted editing time (false positive) or a silently declining page left unreviewed (false negative).</p>
+
+<h2>2. Data</h2>
+<p>Modeling used the anonymized starter dataset (30,000 rows, one row = one content page over a 90-day window). Data-contract verification used the gated FlyRank/internship-warehouse release on Hugging Face, queried via DuckDB. No raw client names, URLs, or queries were used. No FlyRank product decision flags were used as features.</p>
+
+<h2>3. Methodology</h2>
+<p><strong>Features:</strong> impressions_90d, sessions_90d, content_age_days, days_since_last_update, avg_position, ctr, word_count, engagement_rate.</p>
+<p><strong>Label (proxy):</strong> trend_direction == "down" - a current-window bucket, not a confirmed future outcome.</p>
+<p><strong>Baseline:</strong> a transparent rule combining three reason codes - stale_visible_page, declining_with_demand, low_ctr_visible_page.</p>
+<p><strong>Model:</strong> Random Forest Classifier (200 trees, balanced class weight).</p>
+<p><strong>Validation:</strong> client-grouped holdout split so no client's pages appear in both train and test.</p>
+<p><strong>Leakage checks:</strong> confirmed no product flags and no future-window data entered the feature set.</p>
+
+<h2>4. Results (vs Baseline)</h2>
+<p>The Random Forest model outperformed the transparent baseline on Precision@50 using the identical client-grouped split, indicating the model captures signal a fixed rule misses. Full numbers are in work/notebooks/capstone.ipynb.</p>
+
+<h2>5. Limitations</h2>
+<ul>
+<li>The label is a current-window proxy, not a validated future outcome.</li>
+<li>No causal claim: this cannot prove a refresh will cause recovery.</li>
+<li>Results are from a 30,000-row anonymized starter slice, not the full warehouse.</li>
+<li>The warehouse history is an unbalanced panel.</li>
+<li>No Google ranking algorithm factors are claimed.</li>
+</ul>
+
+<h2>6. Ranked Recommendations</h2>
+<p>The top-ranked pages combine staleness, visibility, and declining demand signals. These are observed, directional, decision-support recommendations. Full ranked table in work/notebooks/capstone.ipynb, Section 6.</p>
+
+<h2>7. Reproducibility</h2>
+<ul>
+<li>Weekly notebooks: work/notebooks/w01-w05</li>
+<li>Capstone notebook: work/notebooks/capstone.ipynb</li>
+<li>Starter pipeline: notebooks/, scripts/</li>
+</ul>
+
+<h2>Acknowledgments & Data Credit</h2>
+<p>Built on the FlyRank ML Internship dataset. Data source: <a href="https://flyrank.ai" target="_blank">https://flyrank.ai</a></p>
+
+<div class="note">Public-safe: no client names, domains, URLs, private queries, credentials, or causal/algorithm-discovery claims appear in this paper.</div>
+
+</body>
+</html>
